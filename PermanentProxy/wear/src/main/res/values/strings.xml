@@ -5,4 +5,6 @@
     values-round/strings.xml for round devices.
     -->
     <string name="hello_world">Hello Square World!</string>
+    <string name="start_proxy">Start Proxy</string>
+    <string name="adb_enabled">ADB over wifi enabled?</string>
 </resources>

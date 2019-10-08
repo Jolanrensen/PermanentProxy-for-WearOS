@@ -15,11 +15,12 @@
         android:padding="@dimen/inner_frame_layout_padding"
         app:boxedEdges="all">
 
-        <TextView
-            android:id="@+id/text"
+        <Button
+            android:id="@+id/start_proxy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/hello_world" />
+            android:text="@string/start_proxy"
+            android:layout_gravity="center" />
 
     </FrameLayout>
 </androidx.wear.widget.BoxInsetLayout>
