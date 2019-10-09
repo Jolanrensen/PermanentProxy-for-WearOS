@@ -1,5 +1,3 @@
 <resources>
-    <string name="hello_world">Hello Round World!</string>
-    <string name="start_proxy">Start Proxy</string>
-    <string name="adb_enabled">ADB over wifi enabled?</string>
+
 </resources>

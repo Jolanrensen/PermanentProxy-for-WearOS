@@ -9,18 +9,95 @@
     tools:context=".MainActivity"
     tools:deviceIds="wear">
 
-    <FrameLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/inner_frame_layout_padding"
-        app:boxedEdges="all">
+        android:nestedScrollingEnabled="true"
+        android:background="@color/dark_grey"
+        app:boxedEdges="left|right">
 
-        <Button
-            android:id="@+id/start_proxy"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:id="@+id/main_menu"
             android:layout_height="wrap_content"
-            android:text="@string/start_proxy"
-            android:layout_gravity="center" />
+            android:orientation="vertical">
 
-    </FrameLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="8dp"
+                android:text="@string/status"
+                android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/loading"
+                android:textAppearance="@android:style/TextAppearance.Material.Body1"
+                tools:text="proxy..." />
+
+            <Switch
+                android:id="@+id/proxy_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:minHeight="45dp"
+                android:enabled="false"
+                android:text="@string/proxy" />
+
+            <Switch
+                android:id="@+id/on_boot_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="45dp"
+                android:enabled="false"
+                android:text="@string/start_on_boot" />
+
+            <TextView
+                android:id="@+id/set_proxy_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:enabled="false"
+                android:gravity="center_vertical"
+                android:minHeight="45dp"
+                android:text="@string/set_proxy_address"
+                android:textAppearance="@android:style/TextAppearance.Material.Body1" />
+
+            <TextView
+                android:id="@+id/set_proxy_port"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:enabled="false"
+                android:minHeight="45dp"
+                android:layout_marginBottom="45dp"
+                android:text="@string/set_proxy_port"
+                android:textAppearance="@android:style/TextAppearance.Material.Body1" />
+
+            <EditText
+                android:id="@+id/text_input"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1"
+                android:visibility="gone" />
+
+            <EditText
+                android:id="@+id/port_input"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:imeOptions="actionSearch"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                android:visibility="gone" />
+        </LinearLayout>
+
+    </ScrollView>
 </androidx.wear.widget.BoxInsetLayout>

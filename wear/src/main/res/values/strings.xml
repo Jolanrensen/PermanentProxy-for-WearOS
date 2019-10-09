@@ -1,10 +1,20 @@
 <resources>
-    <string name="app_name">PermanentProxy</string>
+    <string name="app_name">Permanent Proxy</string>
     <!--
     This string is used for square devices and overridden by hello_world in
     values-round/strings.xml for round devices.
     -->
     <string name="hello_world">Hello Square World!</string>
     <string name="start_proxy">Start Proxy</string>
-    <string name="adb_enabled">ADB over wifi enabled?</string>
+    <string name="adb_enabled">Please enable ADB over bluetooth and \"always allow computer\" if asked (you can Google how to do it).</string>
+    <string name="success_proxy">Successfully set proxy</string>
+    <string name="status">Status:</string>
+    <string name="loading">loading…</string>
+    <string name="proxy">Proxy</string>
+    <string name="start_on_boot">Enable on boot</string>
+    <string name="set_proxy">Set proxy</string>
+    <string name="set_proxy_address">Set proxy address</string>
+    <string name="set_proxy_port">Set proxy port</string>
+    <string name="not_enabled">Not enabled</string>
+    <string name="something_wrong">Something went wrong, try again</string>
 </resources>
