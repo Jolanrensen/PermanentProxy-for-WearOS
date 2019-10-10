@@ -17,4 +17,7 @@
     <string name="set_proxy_port">Set proxy port</string>
     <string name="not_enabled">Not enabled</string>
     <string name="something_wrong">Something went wrong, try again</string>
+    <string name="show_me_how">Show me how</string>
+    <string name="title_activity_enable_adbbluetooth">EnableADBBluetoothActivity</string>
+    <string name="instructions"><![CDATA[To get started, first enable the Developer Options of your watch, which can be achieved by going to Settings -> System -> About and tap the Build number until you are a \"developer\".\nNext, go to Settings -> Developer options and enable \"ADB debugging\" and \"Debug over Bluetooth\".\nFinally start up Permanent Proxy and press \"Always allow this Computer\" if prompted.\n\nNow you can get started! Simply enter a proxy address and port, enable it (and on boot if you like) and you\'re done!\n\nProxy services can be found online and can be from any country. However, do make sure you completely trust the proxy you chose before you enter it! All the data of your watch might be sent through that proxy, even sensitive data, so act at your own risk.]]></string>
 </resources>

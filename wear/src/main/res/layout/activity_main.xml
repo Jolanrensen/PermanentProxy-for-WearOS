@@ -40,6 +40,19 @@
                 android:textAppearance="@android:style/TextAppearance.Material.Body1"
                 tools:text="@string/adb_enabled" />
 
+            <TextView
+                android:id="@+id/show_me_how"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:enabled="true"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:gravity="center_vertical"
+                android:minHeight="45dp"
+                android:text="@string/show_me_how"
+                android:textAppearance="@android:style/TextAppearance.Material.Body1" />
+
             <Switch
                 android:id="@+id/proxy_switch"
                 android:layout_width="match_parent"

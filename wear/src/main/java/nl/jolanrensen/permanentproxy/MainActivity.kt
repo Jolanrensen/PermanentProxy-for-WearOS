@@ -1,10 +1,8 @@
 package nl.jolanrensen.permanentproxy
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
-import android.content.res.ColorStateList
-import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.support.wearable.activity.WearableActivity
 import android.view.View
@@ -13,9 +11,6 @@ import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH
 import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.Switch
 import androidx.core.content.edit
 import androidx.core.content.getSystemService
 import androidx.core.view.isVisible
@@ -26,7 +21,6 @@ import nl.jolanrensen.permanentproxy.Constants.logE
 import nl.jolanrensen.permanentproxy.Constants.startProxy
 import nl.jolanrensen.permanentproxy.Constants.stopProxy
 import nl.jolanrensen.permanentproxy.Constants.toast
-import nl.jolanrensen.permanentproxy.Constants.toastLong
 import kotlin.concurrent.thread
 
 class MainActivity : WearableActivity() {
@@ -58,6 +52,12 @@ class MainActivity : WearableActivity() {
         setAmbientEnabled()
 
         setupStatus(continueSetup = true)
+
+        show_me_how.setOnClickListener {
+            startActivity(
+                Intent(this, EnableADBBluetoothActivity::class.java)
+            )
+        }
     }
 
     private fun setupStatus(continueSetup: Boolean) {
@@ -79,6 +79,7 @@ class MainActivity : WearableActivity() {
                         setAllEnabled(main_menu)
                         val proxy = it!![2].let { if (it == "null") null else it }
                         status.text = proxy ?: getString(R.string.not_enabled)
+                        show_me_how.isVisible = false
                         if (continueSetup) continueSetup(enabled = proxy != null)
                     }
                 }
@@ -87,6 +88,7 @@ class MainActivity : WearableActivity() {
                 runOnUiThread {
                     runOnUiThread {
                         status.text = getString(R.string.adb_enabled)
+                        show_me_how.isVisible = true
                     }
                 }
             }
