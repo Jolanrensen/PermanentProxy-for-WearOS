@@ -149,6 +149,7 @@ class MainActivity : WearableActivity() {
             if (proxy_switch.isChecked) {
                 stopProxy()
                 setupStatus()
+                proxy_switch.isChecked = false
             }
             text_input.isVisible = true
             text_input.setText(p!!.getString("address", ""))
@@ -182,6 +183,7 @@ class MainActivity : WearableActivity() {
             if (proxy_switch.isChecked) {
                 stopProxy()
                 setupStatus()
+                proxy_switch.isChecked = false
             }
             port_input.isVisible = true
             port_input.setText(p!!.getInt("port", -1).let { if (it == -1) "" else it.toString() })
