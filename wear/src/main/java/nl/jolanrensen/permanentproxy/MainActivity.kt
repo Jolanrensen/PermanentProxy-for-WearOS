@@ -86,7 +86,7 @@ class MainActivity : WearableActivity() {
                 logE("$logs", e)
                 runOnUiThread {
                     runOnUiThread {
-                        toastLong(getString(R.string.adb_enabled))
+                        status.text = getString(R.string.adb_enabled)
                     }
                 }
             }
