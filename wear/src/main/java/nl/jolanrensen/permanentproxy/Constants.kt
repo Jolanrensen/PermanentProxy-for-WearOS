@@ -2,6 +2,7 @@ package nl.jolanrensen.permanentproxy
 
 import android.content.Context
 import android.content.Intent
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import kotlin.concurrent.thread
@@ -25,64 +26,28 @@ object Constants {
         "settings delete global http_proxy; settings delete global global_http_proxy_host; settings delete global global_http_proxy_port"
 
     fun Context.startProxy(
-        command: String,
-        onSuccess: ((logs: ArrayList<String>?) -> Unit)? = null,
-        onFailure: ((logs: ArrayList<String>, e: Exception) -> Unit)? = null,
+        address: String,
+        port: Int,
         updateGooglePay: Boolean = true
     ) {
-        thread(start = true) {
-            val logs = arrayListOf<String>()
 
-            try {
-                SendSingleCommand(
-                    logs = logs,
-                    context = this,
-                    ip = "localhost",
-                    port = 7272,
-                    command = command,
-                    timeout = 150,
-                    ctrlC = false
-                ) {
-                    logD(it.toString())
-                    if (updateGooglePay) sendBroadcast(
-                        Intent("android.server.checkin.CHECKIN")
-                    )
-                    onSuccess?.invoke(it)
-                }
-            } catch (e: Exception) {
-                logE("$logs", e)
-                onFailure?.invoke(logs, e)
-            }
-        }
+        Settings.Global.putString(contentResolver, Settings.Global.HTTP_PROXY, "$address:$port")
+        if (updateGooglePay) sendBroadcast(
+            Intent("android.server.checkin.CHECKIN")
+        )
     }
 
-    fun Context.stopProxy(
-        onSuccess: ((logs: ArrayList<String>?) -> Unit)? = null,
-        onFailure: ((logs: ArrayList<String>, e: Exception) -> Unit)? = null
-    ) {
-        thread(start = true) {
-            val logs = arrayListOf<String>()
-
-            try {
-                SendSingleCommand(
-                    logs = logs,
-                    context = this,
-                    ip = "localhost",
-                    port = 7272,
-                    command = getTurnOffProxyCommand(),
-                    timeout = 150,
-                    ctrlC = false
-                ) {
-                    logD(it.toString())
-                    sendBroadcast(
-                        Intent("android.server.checkin.CHECKIN")
-                    )
-                    onSuccess?.invoke(it)
-                }
-            } catch (e: Exception) {
-                logE("$logs", e)
-                onFailure?.invoke(logs, e)
-            }
-        }
+    fun Context.stopProxy() {
+        Settings.Global.putString(contentResolver, Settings.Global.HTTP_PROXY, null)
+        Settings.Global.putString(contentResolver, "global_http_proxy_host", null)
+        Settings.Global.putString(contentResolver, "global_http_proxy_port", null)
     }
+
+    fun Context.getCurrentProxy() = try {
+        Settings.Global.getString(contentResolver, Settings.Global.HTTP_PROXY)
+    } catch (e: Exception) {
+        logE("proxy", e)
+        null
+    }
+
 }
