@@ -22,6 +22,9 @@ import nl.jolanrensen.permanentproxy.Constants.startProxy
 import nl.jolanrensen.permanentproxy.Constants.stopProxy
 import nl.jolanrensen.permanentproxy.Constants.toast
 import kotlin.concurrent.thread
+import android.content.pm.PackageManager
+import nl.jolanrensen.permanentproxy.Constants.getCurrentProxy
+import nl.jolanrensen.permanentproxy.Constants.toastLong
 
 class MainActivity : WearableActivity() {
 
@@ -51,7 +54,45 @@ class MainActivity : WearableActivity() {
         // Enables Always-on
         setAmbientEnabled()
 
-        setupStatus(continueSetup = true)
+        // first check if app has permission to write Secure Settings, else ask to turn on adb over bluetooth
+        if (checkCallingOrSelfPermission("android.permission.WRITE_SECURE_SETTINGS")
+            != PackageManager.PERMISSION_GRANTED) {
+            thread(start = true) {
+                val logs = arrayListOf<String>()
+                try {
+                    SendSingleCommand(
+                        logs = logs,
+                        context = this,
+                        ip = "localhost",
+                        port = 7272,
+                        command = "pm grant \\\nnl.jolanrensen.permanentproxy \\\nandroid.permission.WRITE_SECURE_SETTINGS",
+                        timeout = 4000,
+                        ctrlC = false
+                    ) {
+                        logD(it.toString())
+                        runOnUiThread {
+                            if (checkCallingOrSelfPermission("android.permission.WRITE_SECURE_SETTINGS")
+                                == PackageManager.PERMISSION_GRANTED) {
+                                continueSetup()
+                            } else {
+                                toastLong(getString(R.string.something_wrong))
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    logE("$logs", e)
+                    runOnUiThread {
+                        runOnUiThread {
+                            status.text = getString(R.string.adb_enabled)
+                            show_me_how.isVisible = true
+                        }
+                    }
+                }
+            }
+        } else {
+            continueSetup()
+        }
+
 
         show_me_how.setOnClickListener {
             startActivity(
@@ -60,88 +101,36 @@ class MainActivity : WearableActivity() {
         }
     }
 
-    private fun setupStatus(continueSetup: Boolean) {
-        thread(start = true) {
-            val logs = arrayListOf<String>()
-
-            try {
-                SendSingleCommand(
-                    logs = logs,
-                    context = this,
-                    ip = "localhost",
-                    port = 7272,
-                    command = "settings get global http_proxy",
-                    timeout = 500,
-                    ctrlC = false
-                ) {
-                    logD(it.toString())
-                    runOnUiThread {
-                        setAllEnabled(main_menu)
-                        val proxy = it!![2].let { if (it == "null") null else it }
-                        status.text = proxy ?: getString(R.string.not_enabled)
-                        show_me_how.isVisible = false
-                        if (continueSetup) continueSetup(enabled = proxy != null)
-                    }
-                }
-            } catch (e: Exception) {
-                logE("$logs", e)
-                runOnUiThread {
-                    runOnUiThread {
-                        status.text = getString(R.string.adb_enabled)
-                        show_me_how.isVisible = true
-                    }
-                }
-            }
-        }
+    private fun setupStatus(): Boolean {
+        val proxy = getCurrentProxy()
+        status.text = proxy ?: getString(R.string.not_enabled)
+        return proxy != null
     }
 
-    private fun continueSetup(enabled: Boolean) {
+    private fun continueSetup() {
+        setAllEnabled(main_menu)
+        show_me_how.isVisible = false
+
+        val enabled = setupStatus()
+
         proxy_switch.apply {
             isChecked = enabled
             isEnabled = p!!.getString("address", "")!! != ""
                 && p!!.getInt("port", -1) != -1
 
             setOnClickListener {
-                status.text = getString(R.string.loading)
                 if (!isChecked) {
                     logE("turning off proxy")
-                    stopProxy(
-                        onSuccess = {
-                            runOnUiThread {
-                                isChecked = false
-                                setupStatus(continueSetup = false)
-                            }
-                        },
-                        onFailure = { _, _ ->
-                            runOnUiThread {
-                                isChecked = true
-                                toast(getString(R.string.something_wrong))
-                                setupStatus(continueSetup = false)
-                            }
-                        }
-                    )
+                    stopProxy()
                 } else {
                     logE("turning on proxy")
                     startProxy(
-                        command = getTurnOnProxyCommand(
-                            p!!.getString("address", "")!!,
-                            p!!.getInt("port", -1)
-                        ),
-                        onSuccess = {
-                            runOnUiThread {
-                                isChecked = true
-                                setupStatus(continueSetup = false)
-                            }
-                        },
-                        onFailure = { _, _ ->
-                            runOnUiThread {
-                                isChecked = false
-                                setupStatus(continueSetup = false)
-                                toast(getString(R.string.something_wrong))
-                            }
-                        }
+                        address = p!!.getString("address", "")!!,
+                        port = p!!.getInt("port", -1),
+                        updateGooglePay = true
                     )
                 }
+                setupStatus()
             }
         }
 
@@ -157,20 +146,11 @@ class MainActivity : WearableActivity() {
         }
 
         set_proxy_address.setOnClickListener {
-            if (proxy_switch.isChecked) stopProxy(
-                onSuccess = {
-                    runOnUiThread {
-                        proxy_switch.isChecked = false
-                        setupStatus(continueSetup = false)
-                    }
-                },
-                onFailure = { _, _ ->
-                    runOnUiThread {
-                        toast(getString(R.string.something_wrong))
-                        setupStatus(continueSetup = false)
-                    }
-                }
-            )
+            if (proxy_switch.isChecked) {
+                stopProxy()
+                setupStatus()
+                proxy_switch.isChecked = false
+            }
             text_input.isVisible = true
             text_input.setText(p!!.getString("address", ""))
             showSoftKeyboard(text_input)
@@ -200,20 +180,11 @@ class MainActivity : WearableActivity() {
         }
 
         set_proxy_port.setOnClickListener {
-            if (proxy_switch.isChecked) stopProxy(
-                onSuccess = {
-                    runOnUiThread {
-                        proxy_switch.isChecked = false
-                        setupStatus(continueSetup = false)
-                    }
-                },
-                onFailure = { _, _ ->
-                    runOnUiThread {
-                        toast(getString(R.string.something_wrong))
-                        setupStatus(continueSetup = false)
-                    }
-                }
-            )
+            if (proxy_switch.isChecked) {
+                stopProxy()
+                setupStatus()
+                proxy_switch.isChecked = false
+            }
             port_input.isVisible = true
             port_input.setText(p!!.getInt("port", -1).let { if (it == -1) "" else it.toString() })
             showSoftKeyboard(port_input)
