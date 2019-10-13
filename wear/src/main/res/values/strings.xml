@@ -15,10 +15,13 @@
     <string name="set_proxy">Set proxy</string>
     <string name="set_proxy_address">Set proxy address</string>
     <string name="set_proxy_port">Set proxy port</string>
-    <string name="not_enabled">Not enabled</string>
+    <string name="not_enabled">Proxy not enabled</string>
     <string name="something_wrong">Something went wrong, try again</string>
-    <string name="show_me_how">Show me how</string>
+    <string name="show_me_how">How to enable ADB over Bluetooth?</string>
     <string name="title_activity_enable_adbbluetooth">EnableADBBluetoothActivity</string>
-    <string name="instructions"><![CDATA[To get started, first enable the Developer Options of your watch, which can be achieved by going to Settings -> System -> About and tap the Build number until you are a \"developer\".\nNext, go to Settings -> Developer options and enable \"ADB debugging\" and \"Debug over Bluetooth\".\nFinally start up Permanent Proxy and press \"Allow\" or \"Always allow this Computer\" if prompted.\nAfter the app has requested permission, ADB can be turned off again.\n\nNow you can get started! Simply enter a proxy address and port, enable it (and on boot if you like) and you\'re done!\n\nProxy services can be found online and can be from any country. However, do make sure you completely trust the proxy you chose before you enter it! All the data of your watch might be sent through that proxy, even sensitive data, so act at your own risk.]]></string>
-    <string name="requesting_permission">Requesting permission…</string>
+    <string name="instructions"><![CDATA[To get started, first enable the Developer Options of your watch, which can be achieved by going to Settings -> System -> About and tap the Build number until you are a \"developer\".\nNext, go to Settings -> Developer options and enable \"ADB debugging\" and \"Debug over Bluetooth\".\nFinally start up Permanent Proxy, request permission and press \"Allow\" or \"Always allow this Computer\" if prompted.\nAfter the app has gotten permission, ADB can be turned off again.\n\nNow you can get started! Simply enter a proxy address and port, enable it (and on boot if you like) and you\'re done!\n\nProxy services can be found online and can be from any country. However, do make sure you completely trust the proxy you chose before you enter it! All the data of your watch might be sent through that proxy, even sensitive data, so act at your own risk.]]></string>
+    <string name="requesting_permission">Requesting permission, this can take a while… \"Allow\" or \"Always allow computer\" if prompted.</string>
+    <string name="wss_permission_needed">Write secure settings permission needed. This can be enabled via ADB over Bluetooth.</string>
+    <string name="request_permission">ADB over Bluetooth is enabled, request permission!</string>
+    <string name="permission_granted">Permission granted, ADB can be turned off now.</string>
 </resources>
