@@ -37,14 +37,20 @@ object Constants {
         )
     }
 
-    fun Context.stopProxy() {
-        Settings.Global.putString(contentResolver, Settings.Global.HTTP_PROXY, null)
-        Settings.Global.putString(contentResolver, "global_http_proxy_host", null)
-        Settings.Global.putString(contentResolver, "global_http_proxy_port", null)
+    fun Context.stopProxy(updateGooglePay: Boolean = true) {
+        Settings.Secure.putString(
+            contentResolver,
+            Settings.Global.HTTP_PROXY, "127.0.0.1:8007")
+        if (updateGooglePay) sendBroadcast(
+            Intent("android.server.checkin.CHECKIN")
+        )
     }
 
     fun Context.getCurrentProxy() = try {
-        Settings.Global.getString(contentResolver, Settings.Global.HTTP_PROXY)
+        (Settings.Global.getString(contentResolver, "global_http_proxy_host") + ":" +
+        Settings.Global.getString(contentResolver, "global_http_proxy_port")).let {
+            if (it == "127.0.0.1:8007") null else it
+        }
     } catch (e: Exception) {
         logE("proxy", e)
         null

@@ -17,16 +17,16 @@
         android:paddingEnd="8dp">
 
         <LinearLayout
-            android:layout_width="match_parent"
             android:id="@+id/main_menu"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
                 android:layout_marginTop="8dp"
+                android:gravity="center_horizontal"
                 android:text="@string/status"
                 android:textAppearance="@android:style/TextAppearance.Material.Medium"
                 android:textStyle="bold" />
@@ -36,9 +36,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:text="@string/requesting_permission"
-                android:textAppearance="@android:style/TextAppearance.Material.Body1"
-                tools:text="@string/adb_enabled" />
+                android:text="@string/wss_permission_needed"
+                android:textAppearance="@android:style/TextAppearance.Material.Body1" />
+
+
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@color/grey" />
 
             <TextView
                 android:id="@+id/show_me_how"
@@ -46,28 +54,39 @@
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackground"
                 android:enabled="true"
-                android:visibility="gone"
-                tools:visibility="visible"
                 android:gravity="center_vertical"
                 android:minHeight="45dp"
                 android:text="@string/show_me_how"
-                android:textAppearance="@android:style/TextAppearance.Material.Body1" />
+                android:textAppearance="@android:style/TextAppearance.Material.Body1"
+                 />
+
+            <TextView
+                android:id="@+id/request_permission"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:enabled="true"
+                android:gravity="center_vertical"
+                android:minHeight="45dp"
+                android:text="@string/request_permission"
+                android:textAppearance="@android:style/TextAppearance.Material.Body1"
+                />
 
             <Switch
                 android:id="@+id/proxy_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:minHeight="45dp"
+                android:layout_marginTop="8dp"
                 android:enabled="false"
+                android:minHeight="45dp"
                 android:text="@string/proxy" />
 
             <Switch
                 android:id="@+id/on_boot_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="45dp"
                 android:enabled="false"
+                android:minHeight="45dp"
                 android:text="@string/start_on_boot" />
 
             <TextView
@@ -85,11 +104,11 @@
                 android:id="@+id/set_proxy_port"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?android:attr/selectableItemBackground"
-                android:gravity="center_vertical"
-                android:enabled="false"
-                android:minHeight="45dp"
                 android:layout_marginBottom="45dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:enabled="false"
+                android:gravity="center_vertical"
+                android:minHeight="45dp"
                 android:text="@string/set_proxy_port"
                 android:textAppearance="@android:style/TextAppearance.Material.Body1" />
 
@@ -113,4 +132,34 @@
         </LinearLayout>
 
     </ScrollView>
+
+    <RelativeLayout
+        android:id="@+id/loading"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:background="@color/black"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/requesting_permission"
+            android:textAlignment="center" />
+
+        <ProgressBar
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView"
+            android:layout_centerHorizontal="true"
+            android:foregroundGravity="center" />
+
+    </RelativeLayout>
 </androidx.wear.widget.BoxInsetLayout>

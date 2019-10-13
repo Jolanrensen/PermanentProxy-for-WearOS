@@ -23,6 +23,9 @@ import nl.jolanrensen.permanentproxy.Constants.stopProxy
 import nl.jolanrensen.permanentproxy.Constants.toast
 import kotlin.concurrent.thread
 import android.content.pm.PackageManager
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import nl.jolanrensen.permanentproxy.Constants.getCurrentProxy
 import nl.jolanrensen.permanentproxy.Constants.toastLong
 
@@ -56,7 +59,18 @@ class MainActivity : WearableActivity() {
 
         // first check if app has permission to write Secure Settings, else ask to turn on adb over bluetooth
         if (checkCallingOrSelfPermission("android.permission.WRITE_SECURE_SETTINGS")
-            != PackageManager.PERMISSION_GRANTED) {
+            == PackageManager.PERMISSION_GRANTED) {
+            continueSetup()
+        }
+
+        show_me_how.setOnClickListener {
+            startActivity(
+                Intent(this, EnableADBBluetoothActivity::class.java)
+            )
+        }
+
+        request_permission.setOnClickListener {
+            loading.isVisible = true
             thread(start = true) {
                 val logs = arrayListOf<String>()
                 try {
@@ -71,8 +85,10 @@ class MainActivity : WearableActivity() {
                     ) {
                         logD(it.toString())
                         runOnUiThread {
+                            loading.isVisible = false
                             if (checkCallingOrSelfPermission("android.permission.WRITE_SECURE_SETTINGS")
                                 == PackageManager.PERMISSION_GRANTED) {
+                                toastLong(getString(R.string.permission_granted))
                                 continueSetup()
                             } else {
                                 toastLong(getString(R.string.something_wrong))
@@ -82,26 +98,25 @@ class MainActivity : WearableActivity() {
                 } catch (e: Exception) {
                     logE("$logs", e)
                     runOnUiThread {
-                        runOnUiThread {
-                            status.text = getString(R.string.adb_enabled)
-                            show_me_how.isVisible = true
-                        }
+                        loading.isVisible = false
+                        toastLong(getString(R.string.something_wrong))
                     }
                 }
             }
-        } else {
-            continueSetup()
-        }
-
-
-        show_me_how.setOnClickListener {
-            startActivity(
-                Intent(this, EnableADBBluetoothActivity::class.java)
-            )
         }
     }
 
-    private fun setupStatus(): Boolean {
+    private fun setupStatus(wait: Boolean = false): Boolean {
+        if (wait) {
+            GlobalScope.launch {
+                delay(100)
+                runOnUiThread {
+                    val proxy = getCurrentProxy()
+                    status.text = proxy ?: getString(R.string.not_enabled)
+                }
+            }
+            return false
+        }
         val proxy = getCurrentProxy()
         status.text = proxy ?: getString(R.string.not_enabled)
         return proxy != null
@@ -110,6 +125,7 @@ class MainActivity : WearableActivity() {
     private fun continueSetup() {
         setAllEnabled(main_menu)
         show_me_how.isVisible = false
+        request_permission.isVisible = false
 
         val enabled = setupStatus()
 
@@ -130,7 +146,7 @@ class MainActivity : WearableActivity() {
                         updateGooglePay = true
                     )
                 }
-                setupStatus()
+                setupStatus(wait = true)
             }
         }
 
@@ -148,7 +164,7 @@ class MainActivity : WearableActivity() {
         set_proxy_address.setOnClickListener {
             if (proxy_switch.isChecked) {
                 stopProxy()
-                setupStatus()
+                setupStatus(wait = true)
                 proxy_switch.isChecked = false
             }
             text_input.isVisible = true
@@ -182,7 +198,7 @@ class MainActivity : WearableActivity() {
         set_proxy_port.setOnClickListener {
             if (proxy_switch.isChecked) {
                 stopProxy()
-                setupStatus()
+                setupStatus(wait = true)
                 proxy_switch.isChecked = false
             }
             port_input.isVisible = true
