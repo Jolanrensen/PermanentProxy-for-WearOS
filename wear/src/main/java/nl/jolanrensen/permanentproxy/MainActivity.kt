@@ -39,15 +39,12 @@ class MainActivity : WearableActivity() {
 
         p = getSharedPreferences(packageName, Context.MODE_PRIVATE)
 
-        logE(p!!.getString("bootLogs", "no bootlogs")!!)
-
         getCurrentIP {
             logE("current IP is $it")
             runOnUiThread {
                 ext_ip.text = it ?: getString(R.string.NA)
             }
         }
-
 
         /*
             Turn on proxy with:

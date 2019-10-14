@@ -23,7 +23,7 @@
     <string name="requesting_permission">Requesting permission, this can take a while… \"Allow\" or \"Always allow computer\" if prompted.\nNote: the app works best with WiFi turned OFF.</string>
     <string name="wss_permission_needed">Write secure settings permission needed. This can be enabled via ADB over Bluetooth.</string>
     <string name="request_permission">ADB over Bluetooth is enabled, request permission!</string>
-    <string name="permission_granted">Permission granted, ADB can be turned off unless you want to disable the proxy.</string>
+    <string name="permission_granted">Permission granted,\nADB can be turned off.</string>
     <string name="enable_proxy">Enable proxy</string>
     <string name="disable_proxy">Disable proxy (ADB needed, will reboot watch)</string>
     <string name="turning_off">Turning off proxy, please wait…</string>
