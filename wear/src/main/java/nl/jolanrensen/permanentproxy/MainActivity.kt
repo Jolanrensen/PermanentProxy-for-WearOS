@@ -106,8 +106,8 @@ class MainActivity : WearableActivity() {
                             if (checkCallingOrSelfPermission("android.permission.WRITE_SECURE_SETTINGS")
                                 == PackageManager.PERMISSION_GRANTED
                             ) {
-                                toastLong(getString(R.string.permission_granted))
                                 continueSetup()
+                                toastLong(getString(R.string.permission_granted))
                             } else {
                                 toastLong(getString(R.string.something_wrong))
                             }
