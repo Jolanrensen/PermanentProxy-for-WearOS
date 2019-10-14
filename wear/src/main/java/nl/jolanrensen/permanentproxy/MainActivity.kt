@@ -3,6 +3,7 @@ package nl.jolanrensen.permanentproxy
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.wearable.activity.WearableActivity
 import android.view.View
@@ -15,19 +16,18 @@ import androidx.core.content.edit
 import androidx.core.content.getSystemService
 import androidx.core.view.isVisible
 import kotlinx.android.synthetic.main.activity_main.*
-import nl.jolanrensen.permanentproxy.Constants.getTurnOnProxyCommand
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import nl.jolanrensen.permanentproxy.Constants.PORT
+import nl.jolanrensen.permanentproxy.Constants.currentProxy
+import nl.jolanrensen.permanentproxy.Constants.getCurrentIP
 import nl.jolanrensen.permanentproxy.Constants.logD
 import nl.jolanrensen.permanentproxy.Constants.logE
 import nl.jolanrensen.permanentproxy.Constants.startProxy
 import nl.jolanrensen.permanentproxy.Constants.stopProxy
-import nl.jolanrensen.permanentproxy.Constants.toast
-import kotlin.concurrent.thread
-import android.content.pm.PackageManager
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import nl.jolanrensen.permanentproxy.Constants.getCurrentProxy
 import nl.jolanrensen.permanentproxy.Constants.toastLong
+import kotlin.concurrent.thread
 
 class MainActivity : WearableActivity() {
 
@@ -39,15 +39,28 @@ class MainActivity : WearableActivity() {
 
         p = getSharedPreferences(packageName, Context.MODE_PRIVATE)
 
+        getCurrentIP {
+            logE("current IP is $it")
+            runOnUiThread {
+                ext_ip.text = it ?: getString(R.string.NA)
+            }
+        }
+
         /*
             Turn on proxy with:
             settings put global http_proxy address:port
-            for example 5.9.73.93:8080
+            for example 50.116.3.101:3128
+
+            Turn wifi off!
+            Somehow a proxy survives a reboot lol
+
 
             Turn off proxy with:
             adb shell settings delete global http_proxy
             adb shell settings delete global global_http_proxy_host
             adb shell settings delete global global_http_proxy_port
+
+            settings delete global http_proxy; settings delete global global_http_proxy_host; settings delete global global_http_proxy_port; settings delete global global_http_proxy_exclusion_list; settings delete global global_proxy_pac_url
 
             adb over wifi port: 5555
             adb over bluetooth port: 7272
@@ -59,7 +72,8 @@ class MainActivity : WearableActivity() {
 
         // first check if app has permission to write Secure Settings, else ask to turn on adb over bluetooth
         if (checkCallingOrSelfPermission("android.permission.WRITE_SECURE_SETTINGS")
-            == PackageManager.PERMISSION_GRANTED) {
+            == PackageManager.PERMISSION_GRANTED
+        ) {
             continueSetup()
         }
 
@@ -78,7 +92,7 @@ class MainActivity : WearableActivity() {
                         logs = logs,
                         context = this,
                         ip = "localhost",
-                        port = 7272,
+                        port = PORT,
                         command = "pm grant \\\nnl.jolanrensen.permanentproxy \\\nandroid.permission.WRITE_SECURE_SETTINGS",
                         timeout = 4000,
                         ctrlC = false
@@ -87,9 +101,10 @@ class MainActivity : WearableActivity() {
                         runOnUiThread {
                             loading.isVisible = false
                             if (checkCallingOrSelfPermission("android.permission.WRITE_SECURE_SETTINGS")
-                                == PackageManager.PERMISSION_GRANTED) {
-                                toastLong(getString(R.string.permission_granted))
+                                == PackageManager.PERMISSION_GRANTED
+                            ) {
                                 continueSetup()
+                                toastLong(getString(R.string.permission_granted))
                             } else {
                                 toastLong(getString(R.string.something_wrong))
                             }
@@ -109,16 +124,28 @@ class MainActivity : WearableActivity() {
     private fun setupStatus(wait: Boolean = false): Boolean {
         if (wait) {
             GlobalScope.launch {
-                delay(100)
+                delay(200)
                 runOnUiThread {
-                    val proxy = getCurrentProxy()
+                    val proxy = currentProxy
                     status.text = proxy ?: getString(R.string.not_enabled)
+                }
+                getCurrentIP {
+                    logE("current IP is $it")
+                    runOnUiThread {
+                        ext_ip.text = it ?: getString(R.string.NA)
+                    }
                 }
             }
             return false
         }
-        val proxy = getCurrentProxy()
+        val proxy = currentProxy
         status.text = proxy ?: getString(R.string.not_enabled)
+        getCurrentIP {
+            logE("current IP is $it")
+            runOnUiThread {
+                ext_ip.text = it ?: getString(R.string.NA)
+            }
+        }
         return proxy != null
     }
 
@@ -129,44 +156,42 @@ class MainActivity : WearableActivity() {
 
         val enabled = setupStatus()
 
-        proxy_switch.apply {
-            isChecked = enabled
+        enable_proxy.apply {
+            isVisible = !enabled
             isEnabled = p!!.getString("address", "")!! != ""
                 && p!!.getInt("port", -1) != -1
 
             setOnClickListener {
-                if (!isChecked) {
-                    logE("turning off proxy")
-                    stopProxy()
-                } else {
-                    logE("turning on proxy")
-                    startProxy(
-                        address = p!!.getString("address", "")!!,
-                        port = p!!.getInt("port", -1),
-                        updateGooglePay = true
-                    )
-                }
+                logE("turning on proxy")
+                startProxy(
+                    address = p!!.getString("address", "")!!,
+                    port = p!!.getInt("port", -1),
+                    updateGooglePay = true
+                )
+                toastLong(getString(R.string.other_apps))
+                isVisible = false
+                disable_proxy.isVisible = true
                 setupStatus(wait = true)
             }
         }
 
-        on_boot_switch.apply {
-            isChecked = p!!.getBoolean("onBoot", false)
-            isEnabled = p!!.getString("address", "")!! != ""
-                && p!!.getInt("port", -1) != -1
-            setOnCheckedChangeListener { _, isChecked ->
-                p!!.edit {
-                    putBoolean("onBoot", isChecked)
-                }
+        disable_proxy.apply {
+            isVisible = enabled
+            setOnClickListener {
+                logE("turning off proxy")
+                toastLong(getString(R.string.turning_off))
+                stopProxy(
+                    p = p!!,
+                    onFailure = {
+                        runOnUiThread {
+                            toastLong(getString(R.string.something_wrong))
+                        }
+                    }
+                )
             }
         }
 
         set_proxy_address.setOnClickListener {
-            if (proxy_switch.isChecked) {
-                stopProxy()
-                setupStatus(wait = true)
-                proxy_switch.isChecked = false
-            }
             text_input.isVisible = true
             text_input.setText(p!!.getString("address", ""))
             showSoftKeyboard(text_input)
@@ -179,10 +204,20 @@ class MainActivity : WearableActivity() {
                         logE("address updated to ${text_input.text.toString()}")
                         text_input.isVisible = false
 
-                        on_boot_switch.isEnabled = p!!.getString("address", "")!! != ""
+                        enable_proxy.isEnabled = p!!.getString("address", "")!! != ""
                             && p!!.getInt("port", -1) != -1
-                        proxy_switch.isEnabled = p!!.getString("address", "")!! != ""
-                            && p!!.getInt("port", -1) != -1
+
+                        // update proxy if already running
+                        if (currentProxy != null) {
+                            startProxy(
+                                p = p!!,
+                                address = text_input.text.toString(),
+                                port = p!!.getInt("port", -1),
+                                updateGooglePay = true
+                            )
+                            toastLong(getString(R.string.other_apps))
+                            setupStatus(wait = true)
+                        }
 
                         true
                     }
@@ -196,11 +231,6 @@ class MainActivity : WearableActivity() {
         }
 
         set_proxy_port.setOnClickListener {
-            if (proxy_switch.isChecked) {
-                stopProxy()
-                setupStatus(wait = true)
-                proxy_switch.isChecked = false
-            }
             port_input.isVisible = true
             port_input.setText(p!!.getInt("port", -1).let { if (it == -1) "" else it.toString() })
             showSoftKeyboard(port_input)
@@ -213,10 +243,19 @@ class MainActivity : WearableActivity() {
                         logE("port updated to ${port_input.text.toString().toInt()}")
                         port_input.isVisible = false
 
-                        on_boot_switch.isEnabled = p!!.getString("address", "")!! != ""
+                        enable_proxy.isEnabled = p!!.getString("address", "")!! != ""
                             && p!!.getInt("port", -1) != -1
-                        proxy_switch.isEnabled = p!!.getString("address", "")!! != ""
-                            && p!!.getInt("port", -1) != -1
+
+                        // update proxy if already running
+                        if (currentProxy != null) {
+                            startProxy(
+                                p = p!!,
+                                address = p!!.getString("address", "")!!,
+                                port = port_input.text.toString().toInt(),
+                                updateGooglePay = true
+                            )
+                            setupStatus(wait = true)
+                        }
 
                         true
                     }
