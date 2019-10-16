@@ -48,16 +48,22 @@ constructor(
 ) {
 
     private var splitResponses: ArrayList<String>? = null
+    private var done = false
 
-    val pub = File(context.filesDir, "pub.key")
-    val priv = File(context.filesDir, "priv.key")
+    private val pub = File(context.filesDir, "pub.key")
+    private val priv = File(context.filesDir, "priv.key")
 
-    var stream: AdbStream
-    var adb: AdbConnection
+    private var stream: AdbStream
+    private var adb: AdbConnection
 
     // This implements the AdbBase64 interface required for AdbCrypto
-    val base64Impl: AdbBase64
+    private val base64Impl: AdbBase64
         get() = AdbBase64 { encodeBase64String(it) }
+
+    // Cancel waiting for responses
+    fun cancel() {
+        done = true
+    }
 
     init {
         val sock: Socket
@@ -128,7 +134,6 @@ constructor(
         logD("Command sent")
 
         var responses = ""
-        var done = false
         var timer = 0
 
         logD("Getting responses...")
@@ -152,7 +157,7 @@ constructor(
             while (!done) {
                 delay(1)
                 timer++
-                if (timer == timeout) done = true
+                if (timer >= timeout) done = true
             }
 
             logD("response:\n$responses")
@@ -172,6 +177,7 @@ constructor(
             }
             GlobalScope.launch {
                 while (!stream.isClosed) {
+                    delay(1)
                 }
                 logD("Stream closed, closing Adb...")
 
@@ -187,6 +193,7 @@ constructor(
                 }
                 GlobalScope.launch {
                     while (!sock.isClosed) {
+                        delay(1)
                     }
                     logD("ADB connection socket closed")
                     callBack(splitResponses)

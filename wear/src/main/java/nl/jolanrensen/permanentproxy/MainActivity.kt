@@ -32,6 +32,8 @@ import kotlin.concurrent.thread
 class MainActivity : WearableActivity() {
 
     var p: SharedPreferences? = null
+    @Volatile
+    var currentADBProcess: SendSingleCommand? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,10 +87,11 @@ class MainActivity : WearableActivity() {
 
         request_permission.setOnClickListener {
             loading.isVisible = true
+            loading.requestFocus()
             thread(start = true) {
                 val logs = arrayListOf<String>()
                 try {
-                    SendSingleCommand(
+                    currentADBProcess = SendSingleCommand(
                         logs = logs,
                         context = this,
                         ip = "localhost",
@@ -97,6 +100,7 @@ class MainActivity : WearableActivity() {
                         timeout = 4000,
                         ctrlC = false
                     ) {
+                        currentADBProcess = null
                         logD(it.toString())
                         runOnUiThread {
                             loading.isVisible = false
@@ -111,6 +115,7 @@ class MainActivity : WearableActivity() {
                         }
                     }
                 } catch (e: Exception) {
+                    currentADBProcess = null
                     logE("$logs", e)
                     runOnUiThread {
                         loading.isVisible = false
@@ -118,6 +123,10 @@ class MainActivity : WearableActivity() {
                     }
                 }
             }
+        }
+
+        cancel.setOnClickListener {
+            currentADBProcess?.cancel()
         }
     }
 
@@ -237,24 +246,30 @@ class MainActivity : WearableActivity() {
             port_input.setOnEditorActionListener { _, actionId, _ ->
                 when (actionId) {
                     IME_ACTION_SEARCH -> {
-                        p!!.edit(commit = true) {
-                            putInt("port", port_input.text.toString().toInt())
-                        }
-                        logE("port updated to ${port_input.text.toString().toInt()}")
-                        port_input.isVisible = false
+                        try {
+                            p!!.edit(commit = true) {
+                                putInt("port", port_input.text.toString().toInt())
+                            }
 
-                        enable_proxy.isEnabled = p!!.getString("address", "")!! != ""
-                            && p!!.getInt("port", -1) != -1
+                            logE("port updated to ${port_input.text.toString().toInt()}")
+                            port_input.isVisible = false
 
-                        // update proxy if already running
-                        if (currentProxy != null) {
-                            startProxy(
-                                p = p!!,
-                                address = p!!.getString("address", "")!!,
-                                port = port_input.text.toString().toInt(),
-                                updateGooglePay = true
-                            )
-                            setupStatus(wait = true)
+                            enable_proxy.isEnabled = p!!.getString("address", "")!! != ""
+                                && p!!.getInt("port", -1) != -1
+
+                            // update proxy if already running
+                            if (currentProxy != null) {
+                                startProxy(
+                                    p = p!!,
+                                    address = p!!.getString("address", "")!!,
+                                    port = port_input.text.toString().toInt(),
+                                    updateGooglePay = true
+                                )
+                                setupStatus(wait = true)
+                            }
+                        } catch (e: Exception) {
+                            logE("", e)
+                            toastLong(getString(R.string.valid_port))
                         }
 
                         true

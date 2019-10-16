@@ -104,9 +104,14 @@ object Constants {
 
     fun getCurrentIP(callback: (String?) -> Unit) {
         val process = GlobalScope.launch(Dispatchers.IO) {
-            callback(
-                JSONObject(URL("https://api.ipify.org?format=json").readText()).getString("ip")
-            )
+            try {
+                callback(
+                    JSONObject(URL("https://api.ipify.org?format=json").readText()).getString("ip")
+                )
+            } catch (e: Exception) {
+                logE("", e)
+                callback(null)
+            }
         }
 
         GlobalScope.launch {
