@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.wear.widget.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -73,8 +72,7 @@
                 android:gravity="center_vertical"
                 android:minHeight="45dp"
                 android:text="@string/show_me_how"
-                android:textAppearance="@android:style/TextAppearance.Material.Body1"
-                 />
+                android:textAppearance="@android:style/TextAppearance.Material.Body1" />
 
             <TextView
                 android:id="@+id/request_permission"
@@ -85,31 +83,30 @@
                 android:gravity="center_vertical"
                 android:minHeight="45dp"
                 android:text="@string/request_permission"
-                android:textAppearance="@android:style/TextAppearance.Material.Body1"
-                />
+                android:textAppearance="@android:style/TextAppearance.Material.Body1" />
 
             <TextView
                 android:id="@+id/enable_proxy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:enabled="false"
                 android:background="?android:attr/selectableItemBackground"
-                android:minHeight="45dp"
+                android:enabled="false"
                 android:gravity="center_vertical"
-                android:textAppearance="@android:style/TextAppearance.Material.Body1"
-                android:text="@string/enable_proxy" />
+                android:minHeight="45dp"
+                android:text="@string/enable_proxy"
+                android:textAppearance="@android:style/TextAppearance.Material.Body1" />
 
             <TextView
                 android:id="@+id/disable_proxy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
                 android:background="?android:attr/selectableItemBackground"
                 android:enabled="true"
                 android:gravity="center_vertical"
                 android:minHeight="45dp"
+                android:text="@string/disable_proxy"
                 android:textAppearance="@android:style/TextAppearance.Material.Body1"
-                android:text="@string/disable_proxy" />
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/set_proxy_address"
@@ -155,32 +152,53 @@
 
     </ScrollView>
 
-    <RelativeLayout
+    <ScrollView
         android:id="@+id/loading"
-        android:visibility="gone"
-        tools:visibility="gone"
-        android:background="@color/black"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        android:visibility="gone"
+        android:nestedScrollingEnabled="true"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        tools:visibility="gone">
 
-        <TextView
-            android:id="@+id/textView"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:text="@string/requesting_permission"
-            android:textAlignment="center"
-            android:textAppearance="@android:style/TextAppearance.Material.Body1" />
+            android:orientation="vertical">
 
-        <ProgressBar
-            style="?android:attr/progressBarStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textView"
-            android:layout_centerHorizontal="true"
-            android:foregroundGravity="center" />
+            <TextView
+                android:layout_marginTop="45dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/requesting_permission"
+                android:textAlignment="center"
+                android:textAppearance="@android:style/TextAppearance.Material.Body1" />
 
-    </RelativeLayout>
+            <ProgressBar
+                style="?android:attr/progressBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:foregroundGravity="center"
+                android:indeterminate="true" />
+
+            <TextView
+                android:id="@+id/cancel"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginBottom="45dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:foregroundGravity="center"
+                android:gravity="center"
+                android:minHeight="45dp"
+                android:text="@string/cancel"
+                android:textAlignment="center"
+                android:textAppearance="@android:style/TextAppearance.Material.Body1" />
+
+        </LinearLayout>
+
+    </ScrollView>
 </androidx.wear.widget.BoxInsetLayout>
