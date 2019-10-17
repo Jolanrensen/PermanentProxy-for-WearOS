@@ -19,27 +19,25 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import nl.jolanrensen.permanentproxy.Constants.PORT
 import nl.jolanrensen.permanentproxy.Constants.currentProxy
 import nl.jolanrensen.permanentproxy.Constants.getCurrentIP
-import nl.jolanrensen.permanentproxy.Constants.logD
 import nl.jolanrensen.permanentproxy.Constants.logE
 import nl.jolanrensen.permanentproxy.Constants.startProxy
 import nl.jolanrensen.permanentproxy.Constants.stopProxy
 import nl.jolanrensen.permanentproxy.Constants.toastLong
-import kotlin.concurrent.thread
 
 class MainActivity : WearableActivity() {
 
-    var p: SharedPreferences? = null
-    @Volatile
-    var currentADBProcess: SendSingleCommand? = null
+    private var p: SharedPreferences? = null
+
+    val PERMISSION = 23
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         p = getSharedPreferences(packageName, Context.MODE_PRIVATE)
+
 
         getCurrentIP {
             logE("current IP is $it")
@@ -86,47 +84,12 @@ class MainActivity : WearableActivity() {
         }
 
         request_permission.setOnClickListener {
-            loading.isVisible = true
-            loading.requestFocus()
-            thread(start = true) {
-                val logs = arrayListOf<String>()
-                try {
-                    currentADBProcess = SendSingleCommand(
-                        logs = logs,
-                        context = this,
-                        ip = "localhost",
-                        port = PORT,
-                        command = "pm grant \\\nnl.jolanrensen.permanentproxy \\\nandroid.permission.WRITE_SECURE_SETTINGS",
-                        timeout = 4000,
-                        ctrlC = false
-                    ) {
-                        currentADBProcess = null
-                        logD(it.toString())
-                        runOnUiThread {
-                            loading.isVisible = false
-                            if (checkCallingOrSelfPermission("android.permission.WRITE_SECURE_SETTINGS")
-                                == PackageManager.PERMISSION_GRANTED
-                            ) {
-                                continueSetup()
-                                toastLong(getString(R.string.permission_granted))
-                            } else {
-                                toastLong(getString(R.string.something_wrong))
-                            }
-                        }
-                    }
-                } catch (e: Exception) {
-                    currentADBProcess = null
-                    logE("$logs", e)
-                    runOnUiThread {
-                        loading.isVisible = false
-                        toastLong(getString(R.string.something_wrong))
-                    }
-                }
-            }
-        }
+            startActivityForResult(
+                Intent(this, RequestPermissionActivity::class.java),
+                PERMISSION
 
-        cancel.setOnClickListener {
-            currentADBProcess?.cancel()
+            )
+
         }
     }
 
@@ -300,6 +263,14 @@ class MainActivity : WearableActivity() {
             child.isEnabled = true
 
             if (child is ViewGroup) setAllEnabled(child, *except)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when {
+            requestCode == PERMISSION && resultCode == RESULT_OK -> {
+                continueSetup()
+            }
         }
     }
 }
