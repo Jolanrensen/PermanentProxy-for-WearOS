@@ -31,7 +31,7 @@ class RequestPermissionActivity : WearableActivity() {
                     ip = "localhost",
                     port = Constants.PORT,
                     command = "pm grant \\\nnl.jolanrensen.permanentproxy \\\nandroid.permission.WRITE_SECURE_SETTINGS",
-                    timeout = 4000,
+                    timeout = 2000,
                     ctrlC = false
                 ) {
                     currentADBProcess = null
