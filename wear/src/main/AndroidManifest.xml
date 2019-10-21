@@ -13,7 +13,7 @@
     <uses-permission
         android:name="android.permission.WRITE_SECURE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
-
+    <uses-permission android:name="com.android.vending.BILLING"/>
 
     <application
         android:allowBackup="true"
@@ -34,6 +34,10 @@
             android:value="true" />
 
         <activity
+            android:name=".DonateActivity"
+            android:label="@string/title_activity_donate">
+        </activity>
+        <activity
             android:name=".EnableADBBluetoothActivity"
             android:label="@string/title_activity_enable_adbbluetooth">
         </activity>
@@ -48,7 +52,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".RequestPermissionActivity" />
-
     </application>
 
 </manifest>
