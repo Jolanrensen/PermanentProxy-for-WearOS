@@ -123,12 +123,22 @@
                 android:id="@+id/set_proxy_port"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="45dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:enabled="false"
                 android:gravity="center_vertical"
                 android:minHeight="45dp"
                 android:text="@string/set_proxy_port"
+                android:textAppearance="@android:style/TextAppearance.Material.Body1" />
+
+            <TextView
+                android:id="@+id/donate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="45dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:minHeight="45dp"
+                android:text="@string/donate"
                 android:textAppearance="@android:style/TextAppearance.Material.Body1" />
 
             <EditText
@@ -148,6 +158,7 @@
                 android:inputType="numberDecimal"
                 android:maxLines="1"
                 android:visibility="gone" />
+
         </LinearLayout>
 
     </ScrollView>

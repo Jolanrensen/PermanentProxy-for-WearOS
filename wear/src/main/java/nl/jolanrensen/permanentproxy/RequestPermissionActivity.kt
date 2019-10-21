@@ -13,10 +13,14 @@ class RequestPermissionActivity : WearableActivity() {
 
     @Volatile
     var currentADBProcess: SendSingleCommand? = null
+    @Volatile
+    var stop = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_request_permission)
+
+        setAmbientEnabled()
 
         cancel.setOnClickListener {
             finish()
@@ -31,7 +35,7 @@ class RequestPermissionActivity : WearableActivity() {
                     ip = "localhost",
                     port = Constants.PORT,
                     command = "pm grant \\\nnl.jolanrensen.permanentproxy \\\nandroid.permission.WRITE_SECURE_SETTINGS",
-                    timeout = 2000,
+                    timeout = 2500,
                     ctrlC = false
                 ) {
                     currentADBProcess = null
@@ -57,10 +61,21 @@ class RequestPermissionActivity : WearableActivity() {
                 }
             }
         }
+
+        // useless loading bar to show google the app is doing something
+        thread(start = true) {
+            var s = 0
+            while (s <= 25 && !stop) {
+                loading_bar.progress = ((s / 25f) * 100f).toInt()
+                s++
+                Thread.sleep(1000)
+            }
+        }
     }
 
     override fun onStop() {
         currentADBProcess?.cancel()
+        stop = true
         logE("requesting permission canceled")
         super.onStop()
     }

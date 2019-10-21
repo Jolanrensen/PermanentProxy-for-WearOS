@@ -89,7 +89,12 @@ class MainActivity : WearableActivity() {
                 PERMISSION
 
             )
+        }
 
+        donate.setOnClickListener {
+            startActivity(
+                Intent(this, DonateActivity::class.java)
+            )
         }
     }
 
