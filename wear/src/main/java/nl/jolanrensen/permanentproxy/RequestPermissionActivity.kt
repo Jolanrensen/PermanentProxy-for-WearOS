@@ -13,6 +13,8 @@ class RequestPermissionActivity : WearableActivity() {
 
     @Volatile
     var currentADBProcess: SendSingleCommand? = null
+    @Volatile
+    var stop = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,10 +59,21 @@ class RequestPermissionActivity : WearableActivity() {
                 }
             }
         }
+
+        // useless loading bar to show google the app is doing something
+        thread(start = true) {
+            var s = 0
+            while (s <= 20 && !stop) {
+                loading_bar.progress = ((s / 20f) * 100f).toInt()
+                s++
+                Thread.sleep(1000)
+            }
+        }
     }
 
     override fun onStop() {
         currentADBProcess?.cancel()
+        stop = true
         logE("requesting permission canceled")
         super.onStop()
     }
