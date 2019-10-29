@@ -41,6 +41,20 @@
                 android:progress="0" />
 
             <TextView
+                android:id="@+id/too_long"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:foregroundGravity="center"
+                android:gravity="center"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:minHeight="45dp"
+                android:text="@string/too_long"
+                android:textAlignment="center"
+                android:textAppearance="@android:style/TextAppearance.Material.Body1" />
+
+            <TextView
                 android:id="@+id/cancel"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"

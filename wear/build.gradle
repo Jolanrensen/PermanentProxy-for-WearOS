@@ -11,8 +11,8 @@ android {
         applicationId "nl.jolanrensen.permanentproxy"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 12
-        versionName "3.5"
+        versionCode 14
+        versionName "3.7"
     }
     buildTypes {
         release {
