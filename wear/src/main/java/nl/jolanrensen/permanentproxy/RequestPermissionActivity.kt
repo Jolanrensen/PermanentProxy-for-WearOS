@@ -1,9 +1,11 @@
 package nl.jolanrensen.permanentproxy
 
 import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.wearable.activity.WearableActivity
+import androidx.core.view.isVisible
 import kotlinx.android.synthetic.main.activity_request_permission.*
 import nl.jolanrensen.permanentproxy.Constants.logE
 import nl.jolanrensen.permanentproxy.Constants.toastLong
@@ -65,11 +67,19 @@ class RequestPermissionActivity : WearableActivity() {
         // useless loading bar to show google the app is doing something
         thread(start = true) {
             var s = 0
-            while (s <= 25 && !stop) {
-                loading_bar.progress = ((s / 25f) * 100f).toInt()
+            while (s <= 35 && !stop) {
+                loading_bar.progress = ((s / 35f) * 100f).toInt()
                 s++
                 Thread.sleep(1000)
             }
+            runOnUiThread {
+                too_long.isVisible = true
+                too_long.setOnClickListener {
+                    startActivity(Intent(this, OldWatchActivity::class.java))
+                    finish()
+                }
+            }
+
         }
     }
 

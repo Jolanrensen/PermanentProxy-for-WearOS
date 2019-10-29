@@ -21,6 +21,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import nl.jolanrensen.permanentproxy.Constants.currentProxy
 import nl.jolanrensen.permanentproxy.Constants.getCurrentIP
+import nl.jolanrensen.permanentproxy.Constants.logD
 import nl.jolanrensen.permanentproxy.Constants.logE
 import nl.jolanrensen.permanentproxy.Constants.startProxy
 import nl.jolanrensen.permanentproxy.Constants.stopProxy
@@ -87,13 +88,19 @@ class MainActivity : WearableActivity() {
             startActivityForResult(
                 Intent(this, RequestPermissionActivity::class.java),
                 PERMISSION
-
             )
+            onPause()
         }
 
         donate.setOnClickListener {
             startActivity(
                 Intent(this, DonateActivity::class.java)
+            )
+        }
+
+        old_watch.setOnClickListener {
+            startActivity(
+                Intent(this, OldWatchActivity::class.java)
             )
         }
     }
@@ -252,6 +259,17 @@ class MainActivity : WearableActivity() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        logD("onPause")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        logD("onResume")
+    }
+
+
     private fun showSoftKeyboard(view: View) {
         if (view.requestFocus()) {
             getSystemService<InputMethodManager>()?.apply {
@@ -272,6 +290,7 @@ class MainActivity : WearableActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        onResume()
         when {
             requestCode == PERMISSION && resultCode == RESULT_OK -> {
                 continueSetup()
