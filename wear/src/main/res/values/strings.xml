@@ -50,6 +50,7 @@
     <string name="donation_successful">Thank you very much for donating! It is much appreciated :)</string>
     <string name="too_long">Nothing happens?</string>
     <string name="title_activity_old_watch">OldWatchActivity</string>
+    <string name="_dollar">\$%1$s</string>
     <string name="old_watch">Some older watches are not powerful enough to get Secure Settings permission by itself using my method. If this is the case for your watch, you will need a PC to grant Permanent Proxy permission. The instructions are also available in the mobile app or in the app description.\n\nFirst make sure to connect your watch to your PC via ADB. You can Google how to do this, there are lots of tutorials. When your watch is connected, use the command\n\nadb shell pm grant nl.jolanrensen.permanentproxy android.permission.WRITE_SECURE_SETTINGS\n\nto give Permanent Proxy the permissions needed to turn on/edit the proxy.\n\nTo turn off the proxy, connect to your PC in the same manner as before, but now you will need the following command:\n\nadb shell settings delete global http_proxy; adb shell settings delete global global_http_proxy_host; adb shell settings delete global global_http_proxy_port; adb shell settings delete global global_http_proxy_exclusion_list; adb shell settings delete global global_proxy_pac_url; adb shell reboot</string>
     <string name="request_permission_not_working">Requesting permission or turning off proxy not working?</string>
 </resources>

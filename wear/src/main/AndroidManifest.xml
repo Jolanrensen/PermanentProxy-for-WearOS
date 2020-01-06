@@ -13,7 +13,7 @@
     <uses-permission
         android:name="android.permission.WRITE_SECURE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="com.android.vending.BILLING" />
+<!--    <uses-permission android:name="com.android.vending.BILLING" />-->
 
     <application
         android:allowBackup="true"
@@ -53,6 +53,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".RequestPermissionActivity" />
+        <activity android:name="androidx.wear.activity.ConfirmationActivity" />
     </application>
 
 </manifest>
