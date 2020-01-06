@@ -2,11 +2,18 @@ package nl.jolanrensen.permanentproxy
 
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.ACTION_VIEW
+import android.content.Intent.CATEGORY_BROWSABLE
 import android.content.SharedPreferences
+import android.net.Uri
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.edit
+import androidx.wear.activity.ConfirmationActivity
+import androidx.wear.activity.ConfirmationActivity.EXTRA_ANIMATION_TYPE
+import androidx.wear.activity.ConfirmationActivity.OPEN_ON_PHONE_ANIMATION
+import com.google.android.wearable.intent.RemoteIntent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -121,6 +128,20 @@ object Constants {
                 callback(null)
             }
         }
+    }
+
+    fun Context.launchUrlOnPhone(url: String) {
+        RemoteIntent.startRemoteActivity(
+            this,
+            Intent(ACTION_VIEW)
+                .addCategory(CATEGORY_BROWSABLE)
+                .setData(Uri.parse(url)),
+            null
+        )
+        startActivity(
+            Intent(this, ConfirmationActivity::class.java)
+                .putExtra(EXTRA_ANIMATION_TYPE, OPEN_ON_PHONE_ANIMATION)
+        )
     }
 }
 
