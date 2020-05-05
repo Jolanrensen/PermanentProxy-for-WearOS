@@ -41,6 +41,19 @@ To turn off the proxy, connect to your PC in the same manner as before, but now 
 
     adb shell settings delete global http_proxy; adb shell settings delete global global_http_proxy_host; adb shell settings delete global global_http_proxy_port; adb shell settings delete global global_http_proxy_exclusion_list; adb shell settings delete global global_proxy_pac_url; adb shell reboot
 
+# Some tips:
+- Create your own proxy. Free proxies might work, but usually they stop working within a couple of days if they work at all. A tutorial can be found on XDA developers.
+- Proxies with a password don't work.
+- Don't sideload Google Pay on your watch. It should enable by itself. You can try to disable/enable Google Pay from the Play Store on your watch by searching for it, or by using the Pay Enabler app to quickly open the Google Pay page in the Play Store.
+- Clearing the data of Google Pay using the settings on the watch also helps sometimes. You can also find remove updates / disable the app there.
+- After enabling the proxy, exit the app, give your watch some time and then check back in the Permanent Proxy app to see whether your External IP has changed to the one you entered as proxy. If so, good job, you're connected!
+- You can make your watch refresh its Google Pay availability check in two ways. Either by setting the IP/port again in the Permanent Proxy app, or by tapping "Home App" in Settings, System, About, Versions.
+- Google Pay works if you see the icon in your quick settings.
+- Google Pay get's stuck when adding a new card? Check the Google Play stores for updates for Google Pay.
+- Only cards you can use to pay with your phone in stores can be added to Google Pay on your watch. This means you'll need a card from a supported Google Pay country.
+- Permanent Proxy only works for IPv4 networks. If you're on a network that uses IPv6, in theory, Google can still check your country. Turn off WiFi if you have to.
+- Using a VPN on your phone that routs the internet traffic of the Wear OS app through it is an alternative to Permanent Proxy, but you'll have to turn off WiFi on your watch, only use Bluetooth and keep the VPN on your phone always on.
+- Uninstalling Permanent Proxy will not stop the proxy. Stop the proxy using the app before uninstalling it, or stop the proxy using the ADB command above.
 
 
 Thanks to reddit user /u/shadowban!
