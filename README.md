@@ -43,6 +43,7 @@ To turn off the proxy, connect to your PC in the same manner as before, but now 
 
 # Some tips:
 - Create your own proxy. Free proxies might work, but usually they stop working within a couple of days if they work at all. A tutorial can be found on XDA developers.
+- Use an obscure port on your proxy since all IPv4s are regularly scanned for common services, a passwordless proxy will stand out like a beacon (see https://www.shodan.io/search?query=squid for a couple of million http-proxies). 
 - Proxies with a password don't work.
 - Don't sideload Google Pay on your watch. It should enable by itself. You can try to disable/enable Google Pay from the Play Store on your watch by searching for it, or by using the Pay Enabler app to quickly open the Google Pay page in the Play Store.
 - Clearing the data of Google Pay using the settings on the watch also helps sometimes. You can also find remove updates / disable the app there.
