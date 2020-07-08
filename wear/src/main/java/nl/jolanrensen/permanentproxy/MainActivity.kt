@@ -1,27 +1,18 @@
 package nl.jolanrensen.permanentproxy
 
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.wearable.activity.WearableActivity
-import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
-import android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH
-import android.view.inputmethod.InputMethodManager
-import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
-import androidx.core.content.edit
-import androidx.core.content.getSystemService
 import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import nl.jolanrensen.permanentproxy.Constants.currentProxy
 import nl.jolanrensen.permanentproxy.Constants.getCurrentIP
-import nl.jolanrensen.permanentproxy.Constants.logD
 import nl.jolanrensen.permanentproxy.Constants.logE
 import nl.jolanrensen.permanentproxy.Constants.startProxy
 import nl.jolanrensen.permanentproxy.Constants.stopProxy
@@ -29,30 +20,20 @@ import nl.jolanrensen.permanentproxy.Constants.toastLong
 
 class MainActivity : WearableActivity() {
 
-    private var p: SharedPreferences? = null
 
-    val PERMISSION = 23
+    private val PERMISSION = 23
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        p = getSharedPreferences(packageName, Context.MODE_PRIVATE)
-
-
-        getCurrentIP {
-            logE("current IP is $it")
-            runOnUiThread {
-                ext_ip.text = it ?: getString(R.string.NA)
-            }
-        }
+        setupStatus(true)
 
         /*
             Turn on proxy with:
             settings put global http_proxy address:port
             for example 50.116.3.101:3128
 
-            Turn wifi off!
             Somehow a proxy survives a reboot lol
 
 
@@ -103,34 +84,42 @@ class MainActivity : WearableActivity() {
                 Intent(this, OldWatchActivity::class.java)
             )
         }
+
+        scroll_view.requestFocus()
     }
 
     private fun setupStatus(wait: Boolean = false): Boolean {
         if (wait) {
             GlobalScope.launch {
-                delay(200)
+                delay(1000)
                 runOnUiThread {
                     val proxy = currentProxy
                     status.text = proxy ?: getString(R.string.not_enabled)
                 }
-                getCurrentIP {
-                    logE("current IP is $it")
+                getCurrentIP { ip, country ->
+                    logE("current IP is $ip, $country")
                     runOnUiThread {
-                        ext_ip.text = it ?: getString(R.string.NA)
+                        ext_ip.text =
+                            if (ip == null) getString(R.string.NA) else "$ip, $country"
                     }
                 }
+
             }
             return false
         }
         val proxy = currentProxy
         status.text = proxy ?: getString(R.string.not_enabled)
-        getCurrentIP {
-            logE("current IP is $it")
+        getCurrentIP { ip, country ->
+            logE("current IP is $ip, $country")
             runOnUiThread {
-                ext_ip.text = it ?: getString(R.string.NA)
+                ext_ip.text = if (ip == null) getString(R.string.NA) else "$ip, $country"
             }
         }
         return proxy != null
+    }
+
+    private fun updateSetProxyIsEnabled() {
+        set_proxy.isEnabled = address_input.text.isNotEmpty() && port_input.text.isNotEmpty()
     }
 
     private fun continueSetup() {
@@ -138,22 +127,22 @@ class MainActivity : WearableActivity() {
         show_me_how.isVisible = false
         request_permission.isVisible = false
 
-        val enabled = setupStatus()
+        val enabled: Boolean = setupStatus()
 
-        enable_proxy.apply {
-            isVisible = !enabled
-            isEnabled = p!!.getString("address", "")!! != ""
-                && p!!.getInt("port", -1) != -1
+        set_proxy.apply {
+            isVisible = true
 
             setOnClickListener {
-                logE("turning on proxy")
+                val address = address_input.text.toString()
+                val port = port_input.text.toString().toInt()
+
+                logE("setting proxy")
                 startProxy(
-                    address = p!!.getString("address", "")!!,
-                    port = p!!.getInt("port", -1),
+                    address = address,
+                    port = port,
                     updateGooglePay = true
                 )
                 toastLong(getString(R.string.other_apps))
-                isVisible = false
                 disable_proxy.isVisible = true
                 setupStatus(wait = true)
             }
@@ -165,7 +154,6 @@ class MainActivity : WearableActivity() {
                 logE("turning off proxy")
                 toastLong(getString(R.string.turning_off))
                 stopProxy(
-                    p = p!!,
                     onFailure = {
                         runOnUiThread {
                             toastLong(getString(R.string.something_wrong))
@@ -175,108 +163,24 @@ class MainActivity : WearableActivity() {
             }
         }
 
-        set_proxy_address.setOnClickListener {
-            text_input.isVisible = true
-            text_input.setText(p!!.getString("address", ""))
-            showSoftKeyboard(text_input)
-            text_input.setOnEditorActionListener { _, actionId, _ ->
-                when (actionId) {
-                    IME_ACTION_SEARCH -> {
-                        p!!.edit(commit = true) {
-                            putString("address", text_input.text.toString())
-                        }
-                        logE("address updated to ${text_input.text.toString()}")
-                        text_input.isVisible = false
+        proxy_address.isVisible = true
+        proxy_port.isVisible = true
 
-                        enable_proxy.isEnabled = p!!.getString("address", "")!! != ""
-                            && p!!.getInt("port", -1) != -1
+        val (currentAddress, currentPort) = currentProxy?.split(":") ?: listOf(null, null)
 
-                        // update proxy if already running
-                        if (currentProxy != null) {
-                            startProxy(
-                                p = p!!,
-                                address = text_input.text.toString(),
-                                port = p!!.getInt("port", -1),
-                                updateGooglePay = true
-                            )
-                            toastLong(getString(R.string.other_apps))
-                            setupStatus(wait = true)
-                        }
-
-                        true
-                    }
-                    IME_ACTION_DONE -> {
-                        text_input.isVisible = false
-                        true
-                    }
-                    else -> false
-                }
-            }
+        address_input.apply {
+            isVisible = true
+            setText(currentAddress ?: "")
+            doOnTextChanged { _, _, _, _ -> updateSetProxyIsEnabled() }
         }
 
-        set_proxy_port.setOnClickListener {
-            port_input.isVisible = true
-            port_input.setText(p!!.getInt("port", -1).let { if (it == -1) "" else it.toString() })
-            showSoftKeyboard(port_input)
-            port_input.setOnEditorActionListener { _, actionId, _ ->
-                when (actionId) {
-                    IME_ACTION_SEARCH -> {
-                        try {
-                            p!!.edit(commit = true) {
-                                putInt("port", port_input.text.toString().toInt())
-                            }
-
-                            logE("port updated to ${port_input.text.toString().toInt()}")
-                            port_input.isVisible = false
-
-                            enable_proxy.isEnabled = p!!.getString("address", "")!! != ""
-                                && p!!.getInt("port", -1) != -1
-
-                            // update proxy if already running
-                            if (currentProxy != null) {
-                                startProxy(
-                                    p = p!!,
-                                    address = p!!.getString("address", "")!!,
-                                    port = port_input.text.toString().toInt(),
-                                    updateGooglePay = true
-                                )
-                                setupStatus(wait = true)
-                            }
-                        } catch (e: Exception) {
-                            logE("", e)
-                            toastLong(getString(R.string.valid_port))
-                        }
-
-                        true
-                    }
-                    IME_ACTION_DONE -> {
-                        port_input.isVisible = false
-                        true
-                    }
-                    else -> false
-                }
-            }
+        port_input.apply {
+            isVisible = true
+            setText(currentPort ?: "")
+            doOnTextChanged { _, _, _, _ -> updateSetProxyIsEnabled() }
         }
-    }
 
-    override fun onPause() {
-        super.onPause()
-        logD("onPause")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        logD("onResume")
-    }
-
-
-    private fun showSoftKeyboard(view: View) {
-        if (view.requestFocus()) {
-            getSystemService<InputMethodManager>()?.apply {
-                showSoftInput(view, SHOW_IMPLICIT)
-                toggleSoftInput(0, 0)
-            }
-        }
+        updateSetProxyIsEnabled()
     }
 
     private fun setAllEnabled(parent: ViewGroup, vararg except: Int) {

@@ -1,5 +1,6 @@
 package nl.jolanrensen.permanentproxy
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
@@ -41,28 +42,27 @@ object Constants {
     val turnOffProxyCommand =
         "settings delete global http_proxy; \\\nsettings delete global global_http_proxy_host; \\\nsettings delete global global_http_proxy_port; \\\nsettings delete global global_http_proxy_exclusion_list; \\\nsettings delete global global_proxy_pac_url"
 
-    fun Context.startProxy(
-        p: SharedPreferences? = null,
+    fun Activity.startProxy(
         address: String,
         port: Int,
         updateGooglePay: Boolean = true
     ) {
-        p?.edit(commit = true) {
-            putBoolean("onBoot", true)
-        }
         Settings.Global.putString(contentResolver, Settings.Global.HTTP_PROXY, "$address:$port")
-        if (updateGooglePay) sendBroadcast(
-            Intent("android.server.checkin.CHECKIN")
-        )
+        if (updateGooglePay) {
+            GlobalScope.launch {
+                delay(1000)
+                runOnUiThread {
+                    sendBroadcast(Intent("android.server.checkin.CHECKIN"))
+                    logD("Broadcast message to check country for GPay")
+                }
+            }
+
+        }
     }
 
     fun Context.stopProxy(
-        p: SharedPreferences,
         onFailure: (() -> Unit)? = null
     ) {
-        p.edit(commit = true) {
-            putBoolean("onBoot", false)
-        }
         thread(start = true) {
             val logs = arrayListOf<String>()
             try {
@@ -101,7 +101,7 @@ object Constants {
     val Context.currentProxy
         get() = try {
             (Settings.Global.getString(contentResolver, "global_http_proxy_host") + ":" +
-                Settings.Global.getString(contentResolver, "global_http_proxy_port")).let {
+                    Settings.Global.getString(contentResolver, "global_http_proxy_port")).let {
                 if (it == "null:null") null else it
             }
         } catch (e: Exception) {
@@ -109,23 +109,29 @@ object Constants {
             null
         }
 
-    fun getCurrentIP(callback: (String?) -> Unit) {
+    fun getCurrentIP(callback: (ip: String?, countryCode: String?) -> Unit) {
         val process = GlobalScope.launch(Dispatchers.IO) {
             try {
+                val ip: String
                 callback(
-                    JSONObject(URL("https://api.ipify.org?format=json").readText()).getString("ip")
+                    URL("https://api64.ipify.org")
+                        .readText()
+                        .also { ip = it },
+                    JSONObject(
+                        URL("http://ip-api.com/json/$ip").readText()
+                    ).getString("countryCode")
                 )
             } catch (e: Exception) {
                 logE("", e)
-                callback(null)
+                callback(null, null)
             }
         }
 
         GlobalScope.launch {
-            delay(5)
+            delay(100)
             if (process.isActive) {
                 process.cancel()
-                callback(null)
+                callback(null, null)
             }
         }
     }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.wear.widget.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.wear.widget.BoxInsetLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,10 +9,11 @@
     tools:context=".RequestPermissionActivity"
     tools:deviceIds="wear">
 
+    <!--        android:nestedScrollingEnabled="true"-->
     <ScrollView
+        android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:nestedScrollingEnabled="true"
         android:paddingStart="16dp"
         android:paddingEnd="16dp">
 
@@ -67,6 +69,7 @@
                 android:id="@+id/show_me_how"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:enabled="true"
                 android:gravity="center_vertical"
@@ -78,6 +81,7 @@
                 android:id="@+id/request_permission"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:enabled="true"
                 android:gravity="center_vertical"
@@ -86,20 +90,23 @@
                 android:textAppearance="@android:style/TextAppearance.Material.Body1" />
 
             <TextView
-                android:id="@+id/enable_proxy"
+                android:id="@+id/set_proxy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:enabled="false"
                 android:gravity="center_vertical"
                 android:minHeight="45dp"
-                android:text="@string/enable_proxy"
+                android:visibility="gone"
+                android:text="@string/set_proxy"
                 android:textAppearance="@android:style/TextAppearance.Material.Body1" />
 
             <TextView
                 android:id="@+id/disable_proxy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:enabled="true"
                 android:gravity="center_vertical"
@@ -109,31 +116,59 @@
                 android:visibility="gone" />
 
             <TextView
-                android:id="@+id/set_proxy_address"
+                android:id="@+id/proxy_address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackground"
                 android:enabled="false"
+                android:visibility="gone"
                 android:gravity="center_vertical"
                 android:minHeight="45dp"
-                android:text="@string/set_proxy_address"
+                android:text="@string/proxy_address"
                 android:textAppearance="@android:style/TextAppearance.Material.Body1" />
 
+            <EditText
+                android:id="@+id/address_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:autofillHints=""
+                android:visibility="gone"
+                android:hint="@string/address"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1"
+                android:minHeight="45dp" />
+
             <TextView
-                android:id="@+id/set_proxy_port"
+                android:id="@+id/proxy_port"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackground"
                 android:enabled="false"
+                android:visibility="gone"
                 android:gravity="center_vertical"
                 android:minHeight="45dp"
-                android:text="@string/set_proxy_port"
+                android:text="@string/proxy_port"
                 android:textAppearance="@android:style/TextAppearance.Material.Body1" />
+
+            <EditText
+                android:id="@+id/port_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:autofillHints=""
+                android:hint="@string/port"
+                android:imeOptions="actionSearch"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                android:minHeight="45dp" />
 
             <TextView
                 android:id="@+id/donate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:gravity="center_vertical"
                 android:minHeight="45dp"
@@ -144,31 +179,12 @@
                 android:id="@+id/old_watch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="60dp"
+                android:layout_marginBottom="64dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:gravity="center_vertical"
                 android:minHeight="45dp"
                 android:text="@string/request_permission_not_working"
                 android:textAppearance="@android:style/TextAppearance.Material.Body1" />
-
-            <EditText
-                android:id="@+id/text_input"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:maxLines="1"
-                android:visibility="gone" />
-
-            <EditText
-                android:id="@+id/port_input"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:imeOptions="actionSearch"
-                android:inputType="numberDecimal"
-                android:maxLines="1"
-                android:visibility="gone" />
-
         </LinearLayout>
 
     </ScrollView>
