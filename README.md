@@ -7,6 +7,9 @@ So that's why I created this Wear OS app to allow users to use their watch as if
 The app uses Android's built-in http_proxy command that turns on a proxy for the whole system and which normally can only be accessed using a computer and ADB Shell. This app however, uses the "ADB over Bluetooth" functionality of the watch to enable the proxy by itself. This can even be turned on at boot!
 
 # Installation
+
+Don't forget to read all the tips (and proxy tutorial) at the first post on XDA: https://forum.xda-developers.com/android/apps-games/app-enable-google-pay-unsupported-t3980625
+
 Method 1:
 Download the latest mobile-release.apk from https://github.com/Jolanrensen/PermanentProxy-for-WearOS/releases or from https://labs.xda-developers.com/store/app/nl.jolanrensen.permanentproxy and install it on your Android phone.
 Next, go to the "Apps on your phone" section in the Play Store on your Wear OS watch.
