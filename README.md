@@ -59,5 +59,8 @@ To turn off the proxy, connect to your PC in the same manner as before, but now 
 - Using a VPN on your phone that routs the internet traffic of the Wear OS app through it is an alternative to Permanent Proxy, but you'll have to turn off WiFi on your watch, only use Bluetooth and keep the VPN on your phone always on.
 - Uninstalling Permanent Proxy will not stop the proxy. Stop the proxy using the app before uninstalling it, or stop the proxy using the ADB command above.
 
+# Note:
+While I haven't experienced it personally, some users report that the Google Assistant and related processes might confuse your location to the location of your proxy. This could be due to the internet traffic being rerouted to that country. If apps ask for the location of the watch using GPS (or the location of your phone) it should be fine.
+
 
 Thanks to reddit user /u/shadowban!
